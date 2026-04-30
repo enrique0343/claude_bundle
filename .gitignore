@@ -1,0 +1,52 @@
+# Secretos y credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Datos sensibles de pacientes, inventario y exportaciones
+data/
+exports/
+*.csv
+*.xlsx
+*.xls
+*.sqlite
+*.db
+*.dump
+*.sql.gz
+
+# Reportes y salidas locales
+reports/
+output/
+out/
+*.pdf
+*.docx
+*.pptx
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores e IDEs
+.vscode/
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+
+# Node / Python temporales
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Claude Code local
+.claude/cache/
+.claude/sessions/
+.claude/logs/

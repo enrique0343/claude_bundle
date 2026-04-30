@@ -1,0 +1,211 @@
+# ════════════════════════════════════════════════════════
+# GUÍA DE INSTRUCCIONES PARA AGENTES - AVANTE
+# ════════════════════════════════════════════════════════
+# Copia y pega estas instrucciones en Claude Code.
+# Reemplaza los valores entre [corchetes] con datos reales.
+# ════════════════════════════════════════════════════════
+
+
+# ──────────────────────────────────────────────────────
+# AGENTE 1: ANALISTA DE INVENTARIO
+# @odoo-inventory-analyst
+# Perfil: Técnico / Operativo
+# Cuándo usarlo: Cuando necesites saber QUÉ hay en tu
+# inventario, DÓNDE está, CUÁNTO vale y QUÉ riesgo tiene.
+# ──────────────────────────────────────────────────────
+
+# Instrucción 1: Diagnóstico completo de vencimientos por sede
+@odoo-inventory-analyst Necesito un análisis completo de vencimientos del almacén [WHE]. Clasifica los lotes en: vencidos, por vencer en 30 días, por vencer en 31-90 días y sin fecha de vencimiento. Para cada grupo dame: producto, lote, cantidad en stock, ubicación, costo unitario y valor comprometido. Prioriza por valor económico en riesgo y marca las implicaciones JCI (MMU.3.1) en los productos vencidos que aún estén en ubicaciones activas.
+
+# Instrucción 2: Análisis Lean de desperdicios en inventario global
+@odoo-inventory-analyst Realiza un análisis Lean de mi inventario en las 5 compañías. Identifica los 3 mayores desperdicios (Muda) por sobre-inventario: productos con más de 180 días de cobertura (DOI > 180). Calcula el capital inmovilizado en cada caso. Si alguno de esos productos tiene stock bajo en otra compañía, sugiere un movimiento inter-compañía antes de que el estratega de compras haga nuevos pedidos.
+
+# Instrucción 3: Pronóstico de demanda para ajuste de stock de seguridad
+@odoo-inventory-analyst Analiza el consumo de los últimos 6 meses de los 20 productos con mayor rotación en [WHFC - Farmacias Avante Casa Matriz]. Identifica tendencias de crecimiento o decrecimiento. Compara los puntos de reorden actuales en Odoo contra lo que el consumo real sugiere. Dime cuáles están sobre-stockeados y cuáles están en riesgo de quiebre si el proveedor se retrasa 5 días.
+
+
+# ──────────────────────────────────────────────────────
+# AGENTE 2: ESTRATEGA DE COMPRAS
+# @odoo-procurement-strategist
+# Perfil: Táctico / Negociación
+# Cuándo usarlo: Cuando necesites optimizar COSTOS,
+# evaluar PROVEEDORES o implementar LEAN/JIT en compras.
+# ──────────────────────────────────────────────────────
+
+# Instrucción 1: Análisis de variación de costos y oportunidad de ahorro
+@odoo-procurement-strategist Analiza las órdenes de compra del último semestre. Identifica los 15 productos con mayor gasto acumulado. Para cada uno, muéstrame: precio promedio pagado, precio más bajo registrado, precio más alto registrado, número de proveedores distintos y variación porcentual del costo. Calcula cuánto habríamos ahorrado si hubiéramos comprado todo al mejor precio registrado. Presenta el resultado como oportunidad de negociación.
+
+# Instrucción 2: Evaluación de proveedores y confiabilidad de entrega
+@odoo-procurement-strategist Evalúa a nuestros 10 proveedores con mayor volumen de compra. Para cada uno, analiza: número de órdenes en los últimos 6 meses, tiempo promedio de entrega real (desde fecha de orden hasta recepción en almacén), porcentaje de cumplimiento en cantidad (pedido vs recibido), y si tenemos productos críticos donde ese proveedor es la única fuente. Clasifícalos en confiable, aceptable y riesgoso.
+
+# Instrucción 3: Clasificación de productos para modelo Just-in-Time
+@odoo-procurement-strategist Clasifica los productos activos de [WHE - Hospital Especializado] en tres categorías para implementar JIT: (1) Candidatos JIT: bajo costo, alta rotación, proveedor confiable con lead time menor a 5 días. (2) Stock de seguridad: costo medio-alto con riesgo moderado de desabasto. (3) Reserva técnica: productos donde el desabastecimiento es inaceptable clínicamente. Incluye el ahorro estimado en capital de trabajo si pasamos los candidatos JIT a stock mínimo.
+
+
+# ──────────────────────────────────────────────────────
+# AGENTE 3: AUDITOR DE INGRESOS
+# @odoo-revenue-auditor
+# Perfil: Financiero / Control
+# Cuándo usarlo: Cuando necesites verificar que TODO lo
+# que sale de bodega se COBRE al paciente o aseguradora.
+# ──────────────────────────────────────────────────────
+
+# Instrucción 1: Conciliación de cuenta hospitalaria específica
+@odoo-revenue-auditor Realiza una conciliación para el episodio de hospitalización [HOSP2759]. Cruza todas las salidas de inventario (stock.move con state = done) vinculadas a este episodio contra los cargos registrados en la cuenta del paciente. Identifica si hay productos entregados que no aparecen en el reporte de cuenta impreso. Calcula el valor total de la fuga detectada a precio de venta.
+
+# Instrucción 2: Auditoría masiva de fugas de ingresos del mes
+@odoo-revenue-auditor Analiza todos los episodios de hospitalización cerrados en [abril 2026]. Para cada uno, verifica si la cantidad de productos cargados en cuenta coincide con las salidas de inventario registradas. Agrupa las discrepancias por área (quirófano, piso, urgencias) y por tipo de producto (medicamento, insumo, dispositivo). Dame el total de ingresos potencialmente no cobrados y las 5 cuentas con mayor fuga.
+
+# Instrucción 3: Análisis de patrones de omisión de cargos
+@odoo-revenue-auditor Revisa los últimos 3 meses de hospitalizaciones. Identifica patrones recurrentes de omisión de cargo: ¿Hay productos específicos que se olvidan con frecuencia? ¿Hay turnos, áreas o días de la semana donde ocurren más fugas? ¿Hay alguna correlación entre la duración de la estancia y la tasa de error? Presenta los hallazgos como un plan de acción para reducir la fuga en un 50%.
+
+
+# ──────────────────────────────────────────────────────
+# AGENTE 4: DIRECTOR DE OPERACIONES (VALOR PARA DIRECTORIO)
+# @valor-generado-directorio
+# Perfil: Estratégico / Ejecutivo
+# Cuándo usarlo: Cuando necesites JUSTIFICAR una inversión,
+# PRESENTAR un caso de negocio o TRADUCIR datos técnicos
+# en lenguaje de Directorio.
+# ──────────────────────────────────────────────────────
+
+# Instrucción 1: Caso de negocio para implementación de JIT
+@valor-generado-directorio Tenemos datos que muestran $[X] en capital inmovilizado por sobre-inventario y un lead time promedio de proveedores de [Y] días. Construye un caso de negocio para presentar a Directorio proponiendo la implementación de un modelo Just-in-Time en los productos de alta rotación. Incluye el bloque completo de Valor Generado con las 4 dimensiones: impacto económico proyectado (Año 1-3), eficiencia operacional, impacto en personas y riesgo mitigado.
+
+# Instrucción 2: Informe de valor sobre la auditoría de ingresos
+@valor-generado-directorio El auditor de ingresos detectó $[X] en fugas de cargo no cobrado en el último trimestre. Traduce este hallazgo en un informe para Directorio que incluya: el impacto financiero anualizado, la causa raíz del problema, la inversión necesaria para corregirlo (ej. escáneres de código de barras, capacitación), y el retorno proyectado. Usa el formato de Valor Generado con semáforo de recomendación.
+
+# Instrucción 3: Evaluación estratégica de propuesta de automatización
+@valor-generado-directorio Estamos evaluando automatizar los puntos de reorden en Odoo para las 5 compañías. Actualmente las compras se hacen manualmente. Analiza esta propuesta considerando: cuántas horas-persona se liberarían, cuánto se reduciría el riesgo de quiebre de stock, cuál es el impacto en capital de trabajo por optimización de niveles, y qué riesgos de acreditación JCI se mitigan. Entrega un informe ejecutivo con recomendación de Avanzar, Avanzar con condiciones o No avanzar.
+
+
+# ════════════════════════════════════════════════════════
+# FLUJOS DE COLABORACIÓN ENTRE AGENTES
+# (Usa estos cuando necesites un análisis de principio a fin)
+# ════════════════════════════════════════════════════════
+
+# FLUJO 1: De datos crudos a Directorio
+# Paso 1: El analista extrae la evidencia.
+@odoo-inventory-analyst Analiza el stock vencido en todas las compañías. Dame el valor total en riesgo y los 10 productos con mayor pérdida potencial.
+# Paso 2: El Director arma el caso de negocio con esos datos.
+@valor-generado-directorio Con base en los datos de vencimiento que acaba de analizar el analista, genera un informe de Valor Generado proponiendo un plan de acción para reducir la merma por vencimientos en un 40% el próximo trimestre.
+
+# FLUJO 2: De auditoría a recuperación de ingresos
+# Paso 1: El auditor detecta las fugas.
+@odoo-revenue-auditor Realiza una auditoría de fugas de ingresos en los episodios de hospitalización del mes pasado.
+# Paso 2: El Director presenta el plan de recuperación.
+@valor-generado-directorio Con las fugas detectadas por el auditor, construye un caso de negocio para invertir en escáneres de código de barras en enfermería que eliminen las omisiones de cargo.
+
+# FLUJO 3: Optimización completa de compras
+# Paso 1: El analista identifica excedentes.
+@odoo-inventory-analyst Identifica productos con DOI > 120 días en todas las compañías y evalúa si hay necesidad del mismo producto en otra sede.
+# Paso 2: El estratega de compras evalúa los proveedores.
+@odoo-procurement-strategist Con base en los excedentes detectados, analiza qué órdenes de compra abiertas podemos cancelar o reducir. Evalúa si hay contratos por volumen que nos conviene renegociar.
+# Paso 3: El Director presenta el impacto total al Directorio.
+@valor-generado-directorio Consolida los hallazgos del analista de inventario y del estratega de compras. Presenta un informe de Valor Generado que muestre el ahorro total por balanceo inter-compañía + cancelación de compras innecesarias + renegociación de contratos.
+
+
+# ──────────────────────────────────────────────────────
+# AGENTE 5: ESTRATEGA CLÍNICO-COMERCIAL
+# @odoo-clinical-commercial
+# Perfil: Médico/Farmacéutico + Comercial
+# Cuándo usarlo: Cuando necesites MOVER productos que
+# se están estancando, EVITAR vencimientos con acciones
+# clínicas y comerciales, o ANALIZAR la rentabilidad
+# de los insumos por servicio o procedimiento.
+# ──────────────────────────────────────────────────────
+
+# Instrucción 1: Mapa de Riesgo de Vencimiento con Plan FEFO
+@odoo-clinical-commercial Genera un Mapa de Riesgo de Vencimiento para todas las compañías. Identifica los lotes que vencen en los próximos 90 días y calcula si el consumo actual (DAC) es suficiente para agotarlos. Para cada lote en riesgo, propone la mejor acción en orden de prioridad: redistribuir entre sedes → sustitución terapéutica → promoción en farmacia → donación. Incluye el valor económico en juego por cada lote.
+
+# Instrucción 2: Análisis de Rotación por Servicio Clínico
+@odoo-clinical-commercial Analiza el consumo de los últimos 6 meses cruzando stock_move con los servicios clínicos (Cirugía, UCI, Medicina Interna, Urgencias). Identifica qué productos dependen de un solo servicio o un solo médico para su rotación. Si un producto de alto valor tiene baja rotación porque solo lo prescribe una especialidad, recomienda si hay alternativas terapéuticas equivalentes que puedan diversificar el consumo. Incluye el DOI por producto y el margen si está disponible.
+
+# Instrucción 3: Plan Comercial para Farmacia (productos por vencer)
+@odoo-clinical-commercial Revisa el stock de Farmacias Casa Matriz y Farmacias Surf City. Identifica productos que vencen en los próximos 120 días y que todavía están vigentes. Para cada uno, calcula el descuento máximo que se puede ofrecer sin perder dinero (vs. perder el 100% por vencimiento), y genera un plan de promoción farmacéutica con precios sugeridos. Prioriza los productos de mayor valor y mayor margen.
+
+# FLUJO 4: Rotación clínico-comercial completa
+# Paso 1: El analista identifica el inventario estancado y por vencer.
+@odoo-inventory-analyst Identifica todos los productos con DOI > 120 días o con lotes que vencen en los próximos 90 días. Agrupa por compañía y calcula el capital inmovilizado.
+# Paso 2: El clínico-comercial propone el plan de acción.
+@odoo-clinical-commercial Con los productos estancados y por vencer que identificó el analista, genera un Plan de Rotación integral. Para cada producto decide: ¿se redistribuye? ¿se sustituye terapéuticamente? ¿se promociona en farmacia? ¿se devuelve al proveedor? Cuantifica el valor salvado vs. el valor perdido si no se actúa.
+# Paso 3: El director presenta el caso al Directorio.
+@valor-generado-directorio Toma el Plan de Rotación del estratega clínico-comercial y tradúcelo en un caso de negocio para Directorio. Presenta el costo de la inacción (pérdida por vencimientos) vs. el valor de actuar (recuperación de capital, mejora de DOI, cumplimiento JCI).
+
+
+Sedes / Almacenes (6)
+Código	Nombre
+WHC	Botiquín Centro Médico
+WHE	Botiquín Hospital Especializado
+WHUS	Botiquín Unidad Satelital Surf City
+WHFC	Farmacias Avante Casa Matriz
+WHFS	Farmacias Avante Surf City
+CHE	Botiquín Hospital Especializado (Consignación)
+
+Compañías (5)
+ID	Nombre
+1	Avante Centro Médico Especializado
+2	Avante Hospital Especializado
+3	Unidad Satelital Surf City
+4	Farmacias Avante Casa Matriz
+5	Farmacias Avante Surf City
+
+
+# ──────────────────────────────────────────────────────
+# AGENTE 6: PMO EXPERTO OPERATIVO
+# @pmo-experto-operativo
+# Perfil: Gobierno / Ejecución / Seguimiento
+# Cuándo usarlo: Cuando necesites convertir iniciativas,
+# hallazgos o proyectos sueltos en una cartera gobernada
+# con prioridades, responsables, bloqueos y valor capturado.
+# ──────────────────────────────────────────────────────
+
+# Instrucción 1: Construcción de cartera operativa
+@pmo-experto-operativo Estructura mi cartera actual de iniciativas operativas. Clasifica cada proyecto en: pipeline, por definir, listo para iniciar, en ejecución, bloqueado, en validación, cerrado o cerrado sin captura de valor. Para cada uno dame: objetivo, dueño, fecha objetivo, valor esperado, bloqueo principal y siguiente hito.
+
+# Instrucción 2: Comité semanal de seguimiento
+@pmo-experto-operativo Prepara mi comité semanal de proyectos operativos. Señala qué iniciativas avanzaron realmente, cuáles están atrasadas, cuáles están bloqueadas, qué decisiones debo tomar yo esta semana y qué valor está en riesgo de no capturarse si no intervenimos.
+
+# Instrucción 3: Cierre formal de proyecto
+@pmo-experto-operativo Evalúa si el proyecto [automatización de orderpoints] puede cerrarse formalmente. Valida si ya tiene resultado operativo, dueño definitivo, documento actualizado, control definido, evidencia de funcionamiento y valor capturado. Si no cumple, dime exactamente qué falta para no cerrarlo antes de tiempo.
+
+
+# ════════════════════════════════════════════════════════
+# FLUJOS PMO EXPERTO OPERATIVO
+# (Usa estos cuando quieras convertir hallazgos en
+# iniciativas gobernadas y llevarlas hasta cierre real)
+# ════════════════════════════════════════════════════════
+
+# FLUJO 5: Hallazgo de inventario -> iniciativa formal
+# Paso 1: El analista identifica el problema y cuantifica exposición.
+@analista Identifica los 10 productos con mayor capital inmovilizado por DOI > 120 días. Indica compañía, valor inmovilizado, riesgo de vencimiento y oportunidad de balanceo inter-compañía.
+# Paso 2: El PMO convierte el hallazgo en proyecto.
+@pmo-experto-operativo Con base en los hallazgos del @analista, convierte este problema en una iniciativa formal de cartera. Define objetivo, dueño sugerido, áreas involucradas, fecha objetivo, valor esperado, riesgo mitigado, dependencia crítica, siguiente hito y criterio de cierre.
+
+# FLUJO 6: Hallazgo de auditoría -> proyecto de recuperación
+# Paso 1: El auditor detecta la fuga o brecha de control.
+@auditor Analiza las fugas de ingreso del último mes y resume las 3 principales causas raíz con su pérdida económica estimada.
+# Paso 2: El controlador financiero clasifica el valor.
+@controlador-financiero-operativo Con base en los hallazgos del @auditor, separa pérdida ya materializada, ingreso recuperable y costo evitable futuro.
+# Paso 3: El PMO estructura y prioriza la iniciativa.
+@pmo-experto-operativo Toma la salida del @auditor y del @controlador-financiero-operativo y conviértela en una iniciativa formal. Dime prioridad, estado inicial, dueño, hitos, bloqueo probable, decisión requerida y valor esperado vs. valor capturable.
+
+# FLUJO 7: Prioridades del día -> cartera de mejora
+# Paso 1: El monitor diario consolida alertas repetitivas.
+@monitor-operativo-diario Resume las alertas operativas de los últimos días y distingue cuáles son incidentes del día y cuáles son problemas recurrentes que requieren intervención estructural.
+# Paso 2: El PMO separa urgencia diaria de proyecto estructural.
+@pmo-experto-operativo Con base en la salida del @monitor-operativo-diario, separa qué debe resolverse hoy como operación y qué debe elevarse a cartera de proyectos. Para cada iniciativa estructural define dueño, objetivo, urgencia, bloqueo principal y siguiente hito.
+
+# FLUJO 8: Cartera -> comité semanal
+# Paso 1: El PMO prepara el comité.
+@pmo-experto-operativo Prepara mi comité semanal de cartera operativa. Ordena las iniciativas por prioridad y sepáralas en: avanzan bien, atrasadas, bloqueadas y en validación. Indica para cada una: dueño, fecha compromiso, desvío, valor esperado, valor capturado y decisión que necesito tomar esta semana.
+# Paso 2: El asistente del director traduce la sesión para lectura ejecutiva.
+@asistente-director Convierte la salida del @pmo-experto-operativo en una nota ejecutiva de comité con foco en decisiones, riesgos y valor en juego.
+
+# FLUJO 9: Proyecto ejecutado -> validación de valor -> cierre
+# Paso 1: El PMO revisa si la iniciativa ya debería cerrar.
+@pmo-experto-operativo Evalúa si la iniciativa [nombre del proyecto] ya puede pasar a cierre formal. Revisa estado del entregable, dueño operativo, documento actualizado, evidencia de funcionamiento, riesgo residual y vacíos pendientes.
+# Paso 2: El controlador financiero valida captura de valor.
+@controlador-financiero-operativo Con base en la evaluación del @pmo-experto-operativo, valida si el proyecto capturó el valor esperado, si solo capturó una parte o si debe clasificarse como cerrado sin captura de valor.
+# Paso 3: El documentador formaliza el cierre.
+@documentador-procesos Con base en la validación del @pmo-experto-operativo y del @controlador-financiero-operativo, redacta el cierre formal del proyecto incluyendo resultado logrado, control operativo, documento asociado, riesgo residual y pendientes posteriores al cierre.

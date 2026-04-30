@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "odoo-postgres-readonly": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${ODOO_PG_READONLY_URL}"
+      ]
+    },
+    "sharepoint": {
+      "type": "http",
+      "url": "https://YOUR-SHAREPOINT-MCP-ENDPOINT",
+      "headers": {
+        "Authorization": "Bearer ${SHAREPOINT_MCP_TOKEN}"
+      }
+    },
+    "outlook": {
+      "type": "http",
+      "url": "https://YOUR-OUTLOOK-MCP-ENDPOINT",
+      "headers": {
+        "Authorization": "Bearer ${OUTLOOK_MCP_TOKEN}"
+      }
+    }
+  }
+}
