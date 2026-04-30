@@ -64,6 +64,12 @@ async function handleRequest(request, env) {
     return new Response(null, { headers: CORS_HEADERS });
   }
 
+  // GET / — dashboard ejecutivo
+  if (path === '/' || path === '/index.html') {
+    const asset = await env.ASSETS.fetch(request);
+    return asset;
+  }
+
   // GET /health
   if (path === '/health') {
     return json({ status: 'ok', db: env.ODOO_DB });

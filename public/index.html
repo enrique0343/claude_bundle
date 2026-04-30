@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Ejecutivo Semanal — Avante</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root {
+    --negro: #1A1A1A; --carbon: #4A4A4A; --blanco: #FFFFFF;
+    --claro: #F5F5F5; --borde: #E0E0E0;
+    --ok: #2E7D32; --warn: #F9A825; --crit: #C62828; --info: #1565C0;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Century Gothic', 'Arial', sans-serif; margin: 0; background: var(--claro); color: var(--negro); }
+  header { background: var(--negro); color: var(--blanco); padding: 24px 40px; }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: 2px; }
+  header .sub { font-size: 13px; color: #bbb; margin-top: 4px; }
+  .export { float: right; }
+  .export button { background: var(--carbon); color: white; border: 0; padding: 8px 14px; margin-left: 6px; font-family: inherit; cursor: pointer; }
+  .export button:hover { background: #666; }
+  main { padding: 24px 40px; max-width: 1600px; margin: 0 auto; }
+  section { background: white; border: 1px solid var(--borde); padding: 20px 24px; margin-bottom: 18px; }
+  section h2 { margin: 0 0 12px 0; font-size: 14px; letter-spacing: 2px; color: var(--negro); border-bottom: 2px solid var(--negro); padding-bottom: 8px; text-transform: uppercase; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .kpi-card { background: var(--blanco); border-left: 4px solid var(--carbon); padding: 14px 16px; }
+  .kpi-card.🔴 { border-left-color: var(--crit); }
+  .kpi-card.🟡 { border-left-color: var(--warn); }
+  .kpi-card.🟢 { border-left-color: var(--ok); }
+  .kpi-head { display:flex; gap:6px; font-size: 11px; color: var(--carbon); text-transform: uppercase; letter-spacing: 1px; }
+  .kpi-value { font-size: 24px; font-weight: bold; margin: 8px 0 4px 0; color: var(--negro); }
+  .kpi-sub { font-size: 11px; color: var(--carbon); line-height: 1.4; }
+  .kpi-comp { font-size: 11px; margin-top: 6px; color: var(--info); font-weight: bold; }
+
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .chart-box { position: relative; height: 260px; background: white; padding: 8px; }
+  .chart-box h3 { margin: 0 0 6px 0; font-size: 12px; color: var(--carbon); text-transform: uppercase; letter-spacing: 1px; }
+  .chart-canvas { position: relative; height: 220px; overflow: hidden; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead { background: var(--negro); color: white; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--borde); }
+  tbody tr:hover { background: #f9f9f9; }
+
+  .comp-block { background: var(--claro); padding: 12px 16px; }
+  .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dotted var(--borde); }
+  .comp-row:last-child { border: 0; }
+  .comp-arrow { font-size: 12px; font-weight: bold; }
+  .comp-arrow.up { color: var(--crit); }
+  .comp-arrow.down { color: var(--ok); }
+
+  .decision-card { border-left: 4px solid var(--info); background: #f0f6fc; padding: 14px 18px; margin-bottom: 10px; }
+  .decision-card h4 { margin: 0 0 8px 0; color: var(--negro); font-size: 14px; }
+  .decision-card p { margin: 4px 0; font-size: 13px; color: var(--carbon); }
+  .decision-card .impacto { color: var(--negro); font-weight: bold; }
+
+  .dos-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tres-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  footer { padding: 20px 40px; color: var(--carbon); font-size: 11px; text-align: center; }
+  @media print { header .export { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="export">
+    <button onclick="window.print()">Imprimir / PDF</button>
+    <button onclick="exportExcel()">Excel</button>
+  </div>
+  <h1>DASHBOARD EJECUTIVO SEMANAL · AVANTE</h1>
+  <div class="sub">Comité COO + CEO · Corte: 23/04/2026 · Último trimestre rodante</div>
+</header>
+<main>
+
+  <section>
+    <h2>1 · Headline — Lectura en 30 segundos</h2>
+    <div class="kpi-grid">
+<div class="kpi-card 🔴">
+  <div class="kpi-head">
+    <span class="kpi-sema">🔴</span>
+    <span class="kpi-title">Valor Inventario (svl Odoo)</span>
+  </div>
+  <div class="kpi-value">$423,421</div>
+  <div class="kpi-sub">Consignación adicional: $303,505 (no es activo)</div>
+  <div class="kpi-comp">↑ 14.8% vs semana previa</div>
+  <div class="kpi-comp">↑ 8.0% vs hace 4 semanas</div>
+</div>
+
+<div class="kpi-card 🔴">
+  <div class="kpi-head">
+    <span class="kpi-sema">🔴</span>
+    <span class="kpi-title">Capital en Riesgo</span>
+  </div>
+  <div class="kpi-value">$120,025</div>
+  <div class="kpi-sub">Vencido $43,516 · Por vencer 30d $15,278 · Sobrestock $61,230</div>
+  
+  
+</div>
+
+<div class="kpi-card 🟢">
+  <div class="kpi-head">
+    <span class="kpi-sema">🟢</span>
+    <span class="kpi-title">Ahorro Potencial YTD</span>
+  </div>
+  <div class="kpi-value">$9,251</div>
+  <div class="kpi-sub">Sobrestock liberable 15%: $9,185 · Fugas recuperables 70%: $66</div>
+  
+  
+</div>
+
+<div class="kpi-card 🟡">
+  <div class="kpi-head">
+    <span class="kpi-sema">🟡</span>
+    <span class="kpi-title">Fugas de Ingresos (mes)</span>
+  </div>
+  <div class="kpi-value">$52</div>
+  <div class="kpi-sub">1.5% del consumo</div>
+  
+  <div class="kpi-comp">↑ 89% vs mes previo</div>
+</div>
+
+<div class="kpi-card 🔴">
+  <div class="kpi-head">
+    <span class="kpi-sema">🔴</span>
+    <span class="kpi-title">Continuidad Operativa</span>
+  </div>
+  <div class="kpi-value">52.8%</div>
+  <div class="kpi-sub">1772/3355 SKUs con stock ≥ mínimo OP</div>
+  
+  
+</div>
+</div>
+  </section>
+
+  <section>
+    <h2>2 · Financiero (lente CEO)</h2>
+    <div class="chart-box" style="grid-column: 1 / -1; margin-bottom: 14px">
+      <h3>Valor de Inventario Histórico — WHC + WHE (svl Odoo, 13 semanas)</h3>
+      <div class="chart-canvas" style="height:240px"><canvas id="chInv"></canvas></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Gasto de Compras Semanal (USD, sin impuestos)</h3>
+        <div class="chart-canvas"><canvas id="chComp"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <h3>Consumo Operativo Semanal (USD costo)</h3>
+        <div class="chart-canvas"><canvas id="chCons"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <h3>Cargos Facturados Semanales (USD)</h3>
+        <div class="chart-canvas"><canvas id="chCargos"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <h3>Fugas de Ingresos Detectadas (USD reconciliación)</h3>
+        <div class="chart-canvas"><canvas id="chFugas"></canvas></div>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">Comparativos de Gasto</h3>
+    
+<div class="comp-block">
+  <div class="comp-row">
+    <span>Gasto semana actual:</span>
+    <strong>$29,406</strong>
+    <span class="comp-arrow down">↓ 71.9% vs semana previa</span>
+  </div>
+  <div class="comp-row">
+    <span>Gasto mes actual (MTD):</span>
+    <strong>$263,123</strong>
+    <span class="comp-arrow down">↓ 17.3% vs mes previo</span>
+  </div>
+  <div class="comp-row">
+    <span>OCs draft bloqueando presupuesto:</span>
+    <strong>28 OCs — $23,720</strong>
+  </div>
+</div>
+
+    <h3 style="margin-top:18px">Top 10 Palancas de Ahorro Abiertas (variación precio)</h3>
+    <table>
+      <thead><tr><th>Producto</th><th>Min</th><th>Prom</th><th>Max</th><th>Var %</th><th>Ahorro Potencial</th></tr></thead>
+      <tbody>
+<tr>
+  <td>TINTURA BENJUI POR ML (LITRO)</td>
+  <td style="text-align:right">$0</td>
+  <td style="text-align:right">$38</td>
+  <td style="text-align:right">$75</td>
+  <td style="text-align:right">93650.0%</td>
+  <td style="text-align:right"><strong>$374,975</strong></td>
+</tr>
+
+<tr>
+  <td>TIRA REACTIVA HEMOGLUCOTEST (PREMIER) X100 UNIDADES</td>
+  <td style="text-align:right">$0</td>
+  <td style="text-align:right">$8</td>
+  <td style="text-align:right">$10</td>
+  <td style="text-align:right">4900.0%</td>
+  <td style="text-align:right"><strong>$8,428</strong></td>
+</tr>
+
+<tr>
+  <td>PAQUETE BASICO DESCARTABLE</td>
+  <td style="text-align:right">$19</td>
+  <td style="text-align:right">$25</td>
+  <td style="text-align:right">$32</td>
+  <td style="text-align:right">67.0%</td>
+  <td style="text-align:right"><strong>$8,200</strong></td>
+</tr>
+
+<tr>
+  <td>TWIST LANCET (LANCETAS) X200</td>
+  <td style="text-align:right">$0</td>
+  <td style="text-align:right">$2</td>
+  <td style="text-align:right">$2</td>
+  <td style="text-align:right">11750.0%</td>
+  <td style="text-align:right"><strong>$2,820</strong></td>
+</tr>
+
+<tr>
+  <td>DESCARTABLE PARA BOMBA INFUSOMAT SPACE - BRAUN</td>
+  <td style="text-align:right">$7</td>
+  <td style="text-align:right">$9</td>
+  <td style="text-align:right">$9</td>
+  <td style="text-align:right">40.3%</td>
+  <td style="text-align:right"><strong>$1,780</strong></td>
+</tr>
+
+<tr>
+  <td>JERINGA PERFUSORA 50ML (BT)</td>
+  <td style="text-align:right">$4</td>
+  <td style="text-align:right">$4</td>
+  <td style="text-align:right">$5</td>
+  <td style="text-align:right">29.1%</td>
+  <td style="text-align:right"><strong>$1,527</strong></td>
+</tr>
+
+<tr>
+  <td>RECARGA LINEAL 80 MM COLOR AZUL GRAPAS DE 3.8 MM DE TITANIO </td>
+  <td style="text-align:right">$146</td>
+  <td style="text-align:right">$240</td>
+  <td style="text-align:right">$259</td>
+  <td style="text-align:right">77.3%</td>
+  <td style="text-align:right"><strong>$1,496</strong></td>
+</tr>
+
+<tr>
+  <td>EXTENSION DESCARTABLE PARA PERFUSORA BLANCO (BT)</td>
+  <td style="text-align:right">$4</td>
+  <td style="text-align:right">$4</td>
+  <td style="text-align:right">$5</td>
+  <td style="text-align:right">28.9%</td>
+  <td style="text-align:right"><strong>$1,436</strong></td>
+</tr>
+
+<tr>
+  <td>SONDA FOLEY CON BALON #24 DE 3 VIAS (RUSCH)</td>
+  <td style="text-align:right">$1</td>
+  <td style="text-align:right">$5</td>
+  <td style="text-align:right">$6</td>
+  <td style="text-align:right">377.3%</td>
+  <td style="text-align:right"><strong>$1,122</strong></td>
+</tr>
+
+<tr>
+  <td>RECARGA ARTICULADA ENDO GIA TRI-STAPLE 60 MM COLOR MORADO PA</td>
+  <td style="text-align:right">$288</td>
+  <td style="text-align:right">$363</td>
+  <td style="text-align:right">$438</td>
+  <td style="text-align:right">52.1%</td>
+  <td style="text-align:right"><strong>$1,050</strong></td>
+</tr>
+</tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>3 · Operativo (lente COO)</h2>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>% Cargo Exitoso Semanal (recuperación ingresos)</h3>
+        <div class="chart-canvas"><canvas id="chCargoPct"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <h3>Lead Time Promedio Proveedor (días)</h3>
+        <div class="chart-canvas"><canvas id="chLead"></canvas></div>
+      </div>
+    </div>
+    <div class="dos-col" style="margin-top:18px">
+      <div>
+        <h3>Top 5 Proveedores con Lead Time Largo (>15d)</h3>
+        <table>
+          <thead><tr><th>Proveedor</th><th>OCs</th><th>Lead Prom</th><th>Gasto</th></tr></thead>
+          <tbody>
+<tr>
+  <td>MONTREAL SA DE CV</td>
+  <td style="text-align:right">7</td>
+  <td style="text-align:right">19.5d</td>
+  <td style="text-align:right">$534</td>
+</tr>
+</tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Tasa de Cargo Exitoso por Compañía (mes)</h3>
+        <table>
+          <thead><tr><th>Compañía</th><th>% Cargo</th><th>Fuga USD</th></tr></thead>
+          <tbody>
+<tr>
+  <td>Avante Hospital Especializado</td>
+  <td style="text-align:right">98.5%</td>
+  <td style="text-align:right">$49</td>
+</tr>
+
+<tr>
+  <td>AVANTE CENTRO MEDICO ESPECIALI</td>
+  <td style="text-align:right">98.6%</td>
+  <td style="text-align:right">$3</td>
+</tr>
+</tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4 · Riesgo & Cumplimiento (JCI)</h2>
+    <div class="dos-col">
+      <div>
+        <h3>Exposición por Vencimiento</h3>
+        <table>
+          <thead><tr><th>Rango</th><th>Lotes</th><th>Valor USD</th></tr></thead>
+          <tbody>
+<tr>
+  <td>Ya vencidos</td>
+  <td style="text-align:right">462</td>
+  <td style="text-align:right">$34,669</td>
+</tr>
+
+<tr>
+  <td>0-30 días</td>
+  <td style="text-align:right">94</td>
+  <td style="text-align:right">$15,278</td>
+</tr>
+
+<tr>
+  <td>31-60 días</td>
+  <td style="text-align:right">46</td>
+  <td style="text-align:right">$2,144</td>
+</tr>
+
+<tr>
+  <td>61-90 días</td>
+  <td style="text-align:right">76</td>
+  <td style="text-align:right">$10,185</td>
+</tr>
+</tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Riesgo de Abastecimiento</h3>
+        <p style="font-size:13px;color:var(--carbon);line-height:1.7">
+          · <strong>139</strong> SKUs con proveedor único configurado — <em>riesgo de desabastecimiento</em><br>
+          · <strong>1067</strong> lotes en consignación ($303,505) — <em>no es activo propio</em><br>
+          · <strong>122</strong> OCs con ETA vencida<br>
+          · Implicación JCI: MMU.3 (control medicación), MMU.3.1 (medicamentos controlados)
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>5 · Clínico-Comercial</h2>
+    <div class="dos-col">
+      <div class="chart-box" style="height:auto">
+        <h3>Top 10 Categorías por Consumo (últimas 4 semanas)</h3>
+        <div class="chart-canvas" style="height:260px"><canvas id="chCat"></canvas></div>
+      </div>
+      <div>
+        <h3>Productos Críticos en Alerta</h3>
+        <table>
+          <thead><tr><th>Producto</th><th>Sede</th><th>DOI</th><th>Alerta</th></tr></thead>
+          <tbody>
+          <tr><td>ONEMER 30MG/1ML AMPOLLA I.V.-I-M.</td><td>WHE</td><td style="text-align:right">0.1d</td><td>CRITICO</td></tr><tr><td>PISAPEM 1G POLVO PARA SOLUCION INYECTABLE </td><td>WHE</td><td style="text-align:right">0.1d</td><td>CRITICO</td></tr><tr><td>CEFTRIAXONA 1 GR IV - CEFAXONA</td><td>WHE</td><td style="text-align:right">0.1d</td><td>CRITICO</td></tr><tr><td>PARACETAMOL 1GR FIREX IMPROMEDIC</td><td>WHE</td><td style="text-align:right">0.1d</td><td>CRITICO</td></tr><tr><td>SOLUCION CLORURO DE SODIO Y GLUCOSA 1000 ML - MIXT</td><td>WHE</td><td style="text-align:right">0.1d</td><td>CRITICO</td></tr><tr><td>SOLUCION CLORURO DE SODIO 250 ML 0.9% - SSN FRASCO</td><td>WHE</td><td style="text-align:right">0.2d</td><td>CRITICO</td></tr><tr><td>DECOREX DEXAMETASONA 8 MG/2ML AMP EV</td><td>WHE</td><td style="text-align:right">0.2d</td><td>CRITICO</td></tr><tr><td>COMPRESAS QUIRURGICAS ESTERILES X 5 18X18</td><td>WHC</td><td style="text-align:right">0.3d</td><td>CRITICO</td></tr><tr><td>CLORURO DE POTASIO PISA 1.49 G/10 ML SOLUCION INYE</td><td>WHE</td><td style="text-align:right">0.3d</td><td>CRITICO</td></tr><tr><td>BIGOTERA PARA ADULTO </td><td>WHC</td><td style="text-align:right">0.3d</td><td>CRITICO</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>6 · Decisiones del Comité — Esta Semana</h2>
+    
+<div class="decision-card">
+  <h4>◆ Liberar capital inmovilizado en sobrestock</h4>
+  <p><strong>Contexto:</strong> $61,230 en productos con DOI>90 días. Oportunidad de negociar devolución con proveedores, transferir inter-compañía o promocionar.</p>
+  <p><strong>Opciones:</strong> A) Devolución 30% · B) Transferencia WHE↔WHC · C) Plan comercial promocional</p>
+  <p class="impacto"><strong>Impacto:</strong> Liberación estimada $9,185 (15%)</p>
+</div>
+
+<div class="decision-card">
+  <h4>◆ Mitigar dependencia de proveedor único</h4>
+  <p><strong>Contexto:</strong> 139 productos con un único proveedor configurado. Riesgo de desabastecimiento.</p>
+  <p><strong>Opciones:</strong> A) Calificar 2do proveedor para Top 10 · B) Contrato marco con cláusulas · C) Stock seguridad aumentado</p>
+  <p class="impacto"><strong>Impacto:</strong> Mitigación de riesgo — no cuantificable directamente</p>
+</div>
+
+  </section>
+
+  <section>
+    <h2>7 · Compromisos Semana Anterior</h2>
+    <table>
+      <thead><tr><th>Fecha</th><th>Acuerdo</th><th>Responsable</th><th>Plazo</th><th>Estado</th><th>Impacto</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>2026-04-17</td>
+          <td>Ejemplo: revisar contrato DROGUERIA PISA con variación >10%</td>
+          <td>Compras</td>
+          <td>2026-04-24</td>
+          <td>🔴 pendiente</td>
+          <td style="text-align:right">$15,000</td>
+        </tr>
+        </tbody>
+    </table>
+  </section>
+
+</main>
+<footer>
+  Avante Complejo Hospitalario · Fuente: Odoo v18 AvanteProd + AlmightyCS · Generado 2026-04-24 21:44
+</footer>
+
+<script>
+const DATA = {"fecha_reporte": "2026-04-23", "sem_labels": ["2026-W05", "2026-W06", "2026-W07", "2026-W08", "2026-W09", "2026-W10", "2026-W11", "2026-W12", "2026-W13", "2026-W14", "2026-W15", "2026-W16", "2026-W17"], "sem_short": ["26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04"], "serie_inventario": [378575.58, 381595.69, 368379.85, 358666.06, 337803.72, 333661.66, 327491.26, 383505.84, 391924.97, 325617.24, 347373.0, 368861.16, 423421.33], "serie_inv_whc": [201414.9, 211601.42, 213649.58, 220732.67, 220940.55, 226557.05, 222139.41, 221213.35, 231479.8, 220250.61, 225599.09, 226077.37, 246241.01], "serie_inv_whe": [177160.68, 169994.27, 154730.27, 137933.39, 116863.17, 107104.61, 105351.85, 162292.49, 160445.17, 105366.63, 121773.91, 142783.79, 177180.32], "serie_compras": [105936.38, 63806.56, 109066.92, 48725.18, 67626.36, 66140.1, 62895.91, 72493.58, 98066.14, 27574.15, 100791.55, 95827.36, 28317.89], "serie_compras_draft": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1097.86, 1200.0, 3377.16, 4674.34, 32906.8], "serie_consumo": [87643.44, 63891.85, 69722.32, 96950.81, 87999.77, 63979.71, 56507.57, 102111.78, 74119.33, 87690.59, 124694.19, 97743.86, 81832.17], "serie_cargos": [570.61, 2939.43, 4483.33, 2379.78, 260.89, 1712.39, 364.22, 7653.06, 2205.45, 843.83, 8804.17, 9719.18, 76.24], "serie_fugas": [0.0, 0.0, 10.44, 0.0, 3.3, 9.06, 0.0, 5.21, 0.0, 11.41, 2.8, 48.11, 1.3], "serie_fugas_etl": [87643.44, 63891.85, 69722.32, 97757.09, 88465.69, 64917.95, 65333.69, 104334.17, 76850.71, 89383.74, 129409.97, 115994.84, 83430.12], "serie_cargo_pct": [100.0, 100.0, 98.7, 100.0, 98.7, 97.5, 100.0, 99.2, 100.0, 96.4, 99.4, 95.2, 99.9], "serie_lead": [0.0, 0.5, 1.2, 0.7, 1.1, 1.1, 1.5, 1.8, 2.0, 1.0, 1.0, 1.1, 0.3], "palancas": [{"internal_ref": "IM3969", "producto": "TINTURA BENJUI POR ML (LITRO)", "precio_min": 0.08, "precio_max": 75.0, "precio_prom": 37.54, "qty_anual": 10010.0, "gasto": 1550.0, "variacion_pct": 93650.0, "ahorro_potencial": 374975.0}, {"internal_ref": "IM3287", "producto": "TIRA REACTIVA HEMOGLUCOTEST (PREMIER) X100 UNIDADES", "precio_min": 0.2, "precio_max": 10.0, "precio_prom": 8.040000000000001, "qty_anual": 1075.0, "gasto": 950.0, "variacion_pct": 4900.0, "ahorro_potencial": 8428.0}, {"internal_ref": "IM3255", "producto": "PAQUETE BASICO DESCARTABLE", "precio_min": 19.16, "precio_max": 32.0, "precio_prom": 25.025666666666666, "qty_anual": 1398.0, "gasto": 37116.44, "variacion_pct": 67.0, "ahorro_potencial": 8200.0}, {"internal_ref": "IM3353", "producto": "TWIST LANCET (LANCETAS) X200", "precio_min": 0.02, "precio_max": 2.37, "precio_prom": 1.5866666666666667, "qty_anual": 1800.0, "gasto": 741.0, "variacion_pct": 11750.0, "ahorro_potencial": 2820.0}, {"internal_ref": "8700087SP-26", "producto": "DESCARTABLE PARA BOMBA INFUSOMAT SPACE - BRAUN", "precio_min": 6.63, "precio_max": 9.3, "precio_prom": 8.855, "qty_anual": 800.0, "gasto": 7173.0, "variacion_pct": 40.3, "ahorro_potencial": 1780.0}, {"internal_ref": "8728810F-04", "producto": "JERINGA PERFUSORA 50ML (BT)", "precio_min": 3.5, "precio_max": 4.52, "precio_prom": 4.258333333333333, "qty_anual": 2014.0, "gasto": 8579.28, "variacion_pct": 29.1, "ahorro_potencial": 1527.0}, {"internal_ref": "GIA8038L", "producto": "RECARGA LINEAL 80 MM COLOR AZUL GRAPAS DE 3.8 MM DE TITANIO PARA TEJIDO MEDIANO REF. GIA8038L", "precio_min": 146.02, "precio_max": 258.9, "precio_prom": 239.51999999999998, "qty_anual": 16.0, "gasto": 3797.81, "variacion_pct": 77.3, "ahorro_potencial": 1496.0}, {"internal_ref": "8722960", "producto": "EXTENSION DESCARTABLE PARA PERFUSORA BLANCO (BT)", "precio_min": 3.5, "precio_max": 4.51, "precio_prom": 4.397777777777778, "qty_anual": 1600.0, "gasto": 7014.0, "variacion_pct": 28.9, "ahorro_potencial": 1436.0}, {"internal_ref": "183430240", "producto": "SONDA FOLEY CON BALON #24 DE 3 VIAS (RUSCH)", "precio_min": 1.28, "precio_max": 6.11, "precio_prom": 4.9, "qty_anual": 310.0, "gasto": 1844.8, "variacion_pct": 377.3, "ahorro_potencial": 1122.0}, {"internal_ref": "EGIA60AMT", "producto": "RECARGA ARTICULADA ENDO GIA TRI-STAPLE 60 MM COLOR MORADO PARA TEJIDO MEDIANO/GRUESO REF. EGIA60AMT  (SALVAMEDICAL)", "precio_min": 287.61, "precio_max": 437.58, "precio_prom": 362.595, "qty_anual": 14.0, "gasto": 4326.4800000000005, "variacion_pct": 52.1, "ahorro_potencial": 1050.0}], "prov_top_gasto": [{"supplier": "DROGUERIA SANTA LUCIA SA DE CV", "oc_total": 29, "lead_prom": 4.6, "gasto": 48792.0}, {"supplier": "DROGUERIA AMERICANA SA DE CV", "oc_total": 16, "lead_prom": 7.2, "gasto": 30281.0}, {"supplier": "BBRAUN MEDICAL CENTRAL AMERICA CARIBE SA DE CV", "oc_total": 14, "lead_prom": 5.8, "gasto": 29431.0}, {"supplier": "DROGUERIA PISA DE EL SALVADOR SA DE CV", "oc_total": 23, "lead_prom": 2.0, "gasto": 18719.0}, {"supplier": "BIOLIMPIEZA DE EL SALVADOR SA DE CV", "oc_total": 12, "lead_prom": 2.4, "gasto": 14659.0}], "prov_retraso": [{"supplier": "MONTREAL SA DE CV", "oc_total": 7, "lead_prom": 19.5, "gasto": 534.0}], "top_criticos": [{"producto": "ONEMER 30MG/1ML AMPOLLA I.V.-I-M.", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 3.0, "cpd": 31.124, "doi": 0.1, "cost_unit": 0.78, "valor_stock": 2.34, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "PISAPEM 1G POLVO PARA SOLUCION INYECTABLE ", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 1.0, "cpd": 8.788, "doi": 0.1, "cost_unit": 25.0, "valor_stock": 25.0, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "CEFTRIAXONA 1 GR IV - CEFAXONA", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 2.0, "cpd": 16.398, "doi": 0.1, "cost_unit": 1.75, "valor_stock": 3.5, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "PARACETAMOL 1GR FIREX IMPROMEDIC", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 4.0, "cpd": 28.398, "doi": 0.1, "cost_unit": 4.6, "valor_stock": 18.4, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "SOLUCION CLORURO DE SODIO Y GLUCOSA 1000 ML - MIXTO (BOTE)", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 2.0, "cpd": 13.593, "doi": 0.1, "cost_unit": 1.3, "valor_stock": 2.6, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "SOLUCION CLORURO DE SODIO 250 ML 0.9% - SSN FRASCO", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 2.0, "cpd": 13.124, "doi": 0.2, "cost_unit": 1.0, "valor_stock": 2.0, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "DECOREX DEXAMETASONA 8 MG/2ML AMP EV", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 2.0, "cpd": 8.239, "doi": 0.2, "cost_unit": 25.71, "valor_stock": 51.42, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "COMPRESAS QUIRURGICAS ESTERILES X 5 18X18", "categoria": "INSUMOS", "sede": "WHC", "stock": 3.0, "cpd": 11.805, "doi": 0.3, "cost_unit": 4.02, "valor_stock": 12.06, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "CLORURO DE POTASIO PISA 1.49 G/10 ML SOLUCION INYECTABLE", "categoria": "MEDICAMENTOS", "sede": "WHE", "stock": 2.0, "cpd": 7.655, "doi": 0.3, "cost_unit": 0.34, "valor_stock": 0.68, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}, {"producto": "BIGOTERA PARA ADULTO ", "categoria": "INSUMOS", "sede": "WHC", "stock": 2.0, "cpd": 7.363, "doi": 0.3, "cost_unit": 7.13, "valor_stock": 14.26, "nivel_alerta": "CRITICO", "estado_oc": "CON OC"}], "venc_summary": [{"rango": "Ya vencidos", "lotes": 462, "valor": 34668.66}, {"rango": "0-30 d\u00edas", "lotes": 94, "valor": 15278.44}, {"rango": "31-60 d\u00edas", "lotes": 46, "valor": 2143.62}, {"rango": "61-90 d\u00edas", "lotes": 76, "valor": 10184.809999999998}], "top_cat_data": [{"cat": "MEDICAMENTOS", "valor": 401471.622}, {"cat": "INSUMOS", "valor": 167479.2459}, {"cat": "MEDICAMENTOS CONTROLADOS", "valor": 26421.79}], "cargo_cia": [{"cia": "Avante Hospital Especializado", "pct": 98.5, "fuga_usd": 49.0}, {"cia": "AVANTE CENTRO MEDICO ESPECIALIZADO", "pct": 98.6, "fuga_usd": 3.0}], "decisiones": [{"titulo": "Liberar capital inmovilizado en sobrestock", "contexto": "$61,230 en productos con DOI>90 d\u00edas. Oportunidad de negociar devoluci\u00f3n con proveedores, transferir inter-compa\u00f1\u00eda o promocionar.", "opciones": "A) Devoluci\u00f3n 30% \u00b7 B) Transferencia WHE\u2194WHC \u00b7 C) Plan comercial promocional", "impacto": "Liberaci\u00f3n estimada $9,185 (15%)"}, {"titulo": "Mitigar dependencia de proveedor \u00fanico", "contexto": "139 productos con un \u00fanico proveedor configurado. Riesgo de desabastecimiento.", "opciones": "A) Calificar 2do proveedor para Top 10 \u00b7 B) Contrato marco con cl\u00e1usulas \u00b7 C) Stock seguridad aumentado", "impacto": "Mitigaci\u00f3n de riesgo \u2014 no cuantificable directamente"}], "acuerdos": [{"fecha_comite": "2026-04-17", "acuerdo": "Ejemplo: revisar contrato DROGUERIA PISA con variaci\u00f3n >10%", "responsable": "Compras", "plazo": "2026-04-24", "estado": "pendiente", "impacto_usd": 15000, "notas": "Plantilla inicial"}], "consumo_por_cia": {"AVANTE CENTRO MEDICO ESPECIALIZADO": 301553.31, "Avante Hospital Especializado": 1810248.6043}};
+const labels = DATA.sem_short;
+const opts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: { y: { ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+};
+function bar(id, data, color) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: color }] },
+    options: opts
+  });
+}
+function line(id, data, color) {
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels, datasets: [{ data, borderColor: color, backgroundColor: color+'22', tension: 0.3, fill: true }] },
+    options: opts
+  });
+}
+// Inventario: línea con dos compañías
+new Chart(document.getElementById('chInv'), {
+  type: 'line',
+  data: { labels, datasets: [
+    { label: 'WHC', data: DATA.serie_inv_whc, borderColor: '#1565C0', backgroundColor: '#1565C022', tension: 0.3, fill: false },
+    { label: 'WHE', data: DATA.serie_inv_whe, borderColor: '#C62828', backgroundColor: '#C6282822', tension: 0.3, fill: false },
+    { label: 'Total', data: DATA.serie_inventario, borderColor: '#1A1A1A', backgroundColor: '#1A1A1A22', tension: 0.3, fill: true, borderWidth: 2 }
+  ]},
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, position: 'top', labels: { font: { size: 10 } } } },
+    scales: { y: { ticks: { font: { size: 10 }, callback: v => '$'+(v/1000).toFixed(0)+'K' } }, x: { ticks: { font: { size: 10 } } } }
+  }
+});
+
+bar('chComp', DATA.serie_compras, '#1565C0');
+bar('chCons', DATA.serie_consumo, '#4A4A4A');
+bar('chCargos', DATA.serie_cargos, '#2E7D32');
+line('chFugas', DATA.serie_fugas, '#C62828');
+line('chCargoPct', DATA.serie_cargo_pct, '#2E7D32');
+line('chLead', DATA.serie_lead, '#F9A825');
+
+// Top categorías horizontal
+const topCat = DATA.top_cat_data;
+new Chart(document.getElementById('chCat'), {
+  type: 'bar',
+  data: {
+    labels: topCat.map(c=>c.cat.substring(0,25)),
+    datasets: [{ data: topCat.map(c=>c.valor), backgroundColor: '#1A1A1A' }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { ticks: { font: { size: 10 } } }, y: { ticks: { font: { size: 9 } } } }
+  }
+});
+
+function exportExcel() {
+  const wb = XLSX.utils.book_new();
+  const kpiSheet = [[
+    'KPI','Valor'
+  ],['Valor inventario propio', 574763.47],
+    ['Capital en riesgo', 120025.23000000001],
+    ['Ahorro potencial YTD', 9250.6165],
+    ['Fugas mes', 52.209999999999994],
+    ['Continuidad operativa %', 52.8166915052161]];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(kpiSheet), 'KPIs');
+  const serieSheet = [['Semana','Compras','Consumo','Cargos','Fugas','% Cargo','Lead Time']];
+  for(let i=0;i<labels.length;i++) serieSheet.push([labels[i], DATA.serie_compras[i], DATA.serie_consumo[i], DATA.serie_cargos[i], DATA.serie_fugas[i], DATA.serie_cargo_pct[i], DATA.serie_lead[i]]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(serieSheet), 'Series');
+  XLSX.writeFile(wb, 'dashboard_ejecutivo_20260423.xlsx');
+}
+</script>
+</body>
+</html>

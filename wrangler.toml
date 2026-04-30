@@ -1,6 +1,7 @@
 name = "operaciones"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
+assets = { directory = "./public" }
 
 [vars]
 ODOO_DB = "AvanteProd"
