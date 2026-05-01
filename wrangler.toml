@@ -5,3 +5,8 @@ assets = { directory = "./public" }
 
 [vars]
 ODOO_DB = "AvanteProd"
+
+[[d1_databases]]
+binding     = "DB"
+database_name = "avante-ops"
+database_id   = "REEMPLAZAR_CON_ID_REAL"
