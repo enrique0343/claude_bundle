@@ -18,13 +18,17 @@ exports/
 *.dump
 *.sql.gz
 
-# Reportes y salidas locales
+# Reportes y salidas locales (excluir; los dashboards publicados van a docs/)
 reports/
 output/
 out/
 *.pdf
 *.docx
 *.pptx
+
+# GitHub Pages — incluir siempre
+!docs/
+!docs/**
 
 # Sistema operativo
 .DS_Store
