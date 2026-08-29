@@ -8,7 +8,7 @@
 
 ## 1. Resumen ejecutivo
 
-El GTS 2.0 no es un catálogo de procesos. Es un **marco de requisitos auditables**: veintiún requisitos numerados, agrupados en cuatro bloques, cada uno con sus propios indicadores expresados como porcentaje del alcance declarado. Esa es su utilidad práctica para Avante: **convierte «tener trazabilidad» en una medición, no en una opinión.**
+El GTS 2.0 no es un catálogo de procesos. Es un **marco de requisitos auditables**: dieciocho requisitos numerados, agrupados en cuatro bloques, cada uno con sus propios indicadores expresados como porcentaje del alcance declarado. Esa es su utilidad práctica para Avante: **convierte «tener trazabilidad» en una medición, no en una opinión.**
 
 Medida contra ese marco, la posición de Avante es la siguiente. El **diseño** está razonablemente avanzado: los identificadores están elegidos, el modelo de datos maestros está construido campo por campo y el catálogo de procesos existe. La **ejecución** no ha empezado: ningún identificador GS1 está emitido en producción, ningún proceso registra eventos y no existe repositorio de eventos en ningún documento del proyecto.
 
@@ -132,7 +132,7 @@ El bloqueo de hardware es el más barato de resolver y el que hoy invalida todo 
 
 ### Lectura de la evaluación
 
-De veintiún requisitos, **quince están en rojo, cinco en ámbar y ninguno en verde.**
+Los dieciocho requisitos se evalúan en veintiuna líneas, porque R01 y R03 se desglosan por tipo de objeto trazable. De esas veintiuna líneas, **diecisiete están en rojo, cuatro en ámbar y ninguna en verde.**
 
 Esto no descalifica el trabajo hecho. Un proyecto que aún no ha emitido su primer identificador en producción no puede estar en verde en ningún requisito de ejecución, y eso es esperable a esta altura. Lo que la tabla revela son **tres cosas que no se arreglan avanzando al ritmo actual**:
 
